@@ -1,0 +1,483 @@
+openapi: 3.0.0
+info:
+  title: API de gestion
+  description: Documentation de l'API Gestion Boutique
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Serveur local
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+        pseudoname:
+          type: string
+        telephone:
+          type: string
+        adresse:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        nom:
+          type: string
+        prenom:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+        libelle:
+          type: string
+        prix:
+          type: number
+          format: float
+        quantite_stock:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TelephoneSearch:
+      type: object
+      properties:
+        telephone:
+          type: string
+          example: "771234567"
+
+    ArticleSearch:
+      type: object
+      properties:
+        libelle:
+          type: string
+          example: "Produit A"
+
+    StockUpdate:
+      type: object
+      properties:
+        quantite_stock:
+          type: integer
+          example: 50
+
+    Login:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+
+    Register:
+      type: object
+      properties:
+        nom:
+          type: string
+        prenom:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+
+security:
+  - bearerAuth: []
+
+paths:
+  /clients:
+    get:
+      tags:
+        - Clients
+      summary: Récupérer tous les clients
+      description: Obtenir la liste de tous les clients
+      responses:
+        '200':
+          description: Liste des clients récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Client'
+    post:
+      tags:
+        - Clients
+      summary: Créer un nouveau client
+      description: Ajouter un client dans le système
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+      responses:
+        '201':
+          description: Client créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+
+  /clients/{id}:
+    get:
+      tags:
+        - Clients
+      summary: Récupérer un client par ID
+      description: Obtenir les détails d'un client spécifique
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détails du client récupérés avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+    put:
+      tags:
+        - Clients
+      summary: Mettre à jour un client
+      description: Mettre à jour les informations d'un client spécifique
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+      responses:
+        '200':
+          description: Client mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+    delete:
+      tags:
+        - Clients
+      summary: Supprimer un client
+      description: Supprimer un client spécifique
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Client supprimé avec succès
+
+  /clients/telephone:
+    post:
+      tags:
+        - Clients
+      summary: Rechercher un client par téléphone
+      description: Obtenir les informations d'un client en utilisant son numéro de téléphone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelephoneSearch'
+      responses:
+        '200':
+          description: Détails du client récupérés avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+
+  /users:
+    get:
+      tags:
+        - Utilisateurs
+      summary: Récupérer tous les utilisateurs
+      description: Obtenir la liste de tous les utilisateurs
+      responses:
+        '200':
+          description: Liste des utilisateurs récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - Utilisateurs
+      summary: Créer un nouvel utilisateur
+      description: Ajouter un utilisateur dans le système
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Utilisateur créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/login:
+    post:
+      tags:
+        - Authentification
+      summary: Connexion utilisateur
+      description: Authentifier un utilisateur
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: Utilisateur connecté avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/register:
+    post:
+      tags:
+        - Authentification
+      summary: Enregistrer un nouvel utilisateur
+      description: Créer un compte pour un nouvel utilisateur
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+      responses:
+        '201':
+          description: Utilisateur enregistré avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /user:
+    get:
+      tags:
+        - Utilisateurs
+      summary: Récupérer les informations de l'utilisateur connecté
+      description: Obtenir les détails de l'utilisateur actuellement connecté
+      responses:
+        '200':
+          description: Détails de l'utilisateur récupérés avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /logout:
+    post:
+      tags:
+        - Authentification
+      summary: Déconnexion de l'utilisateur
+      description: Déconnecter l'utilisateur actuellement connecté
+      responses:
+        '204':
+          description: Utilisateur déconnecté avec succès
+
+  /articles:
+    get:
+      tags:
+        - Articles
+      summary: Récupérer tous les articles
+      description: Obtenir la liste de tous les articles
+      responses:
+        '200':
+          description: Liste des articles récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+    post:
+      tags:
+        - Articles
+      summary: Créer ou mettre à jour des articles
+      description: Ajouter un nouvel article ou mettre à jour la quantité en stock de plusieurs articles à la fois
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Article'
+                - type: object
+                  properties:
+                    articles:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          quantite_stock:
+                            type: integer
+                  required:
+                    - articles
+      responses:
+        '201':
+          description: Article créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '200':
+          description: Stock des articles mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+
+  /articles/{id}:
+    get:
+      tags:
+        - Articles
+      summary: Récupérer un article par ID
+      description: Obtenir les détails d'un article spécifique
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détails de l'article récupérés avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+    put:
+      tags:
+        - Articles
+      summary: Mettre à jour un article
+      description: Mettre à jour les informations d'un article spécifique
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Article'
+      responses:
+        '200':
+          description: Article mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+    delete:
+      tags:
+        - Articles
+      summary: Supprimer un article
+      description: Supprimer un article spécifique
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Article supprimé avec succès
+
+  /articles/search:
+    post:
+      tags:
+        - Articles
+      summary: Rechercher un article
+      description: Obtenir les informations d'un article en utilisant une recherche par libellé
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticleSearch'
+      responses:
+        '200':
+          description: Détails de l'article récupérés avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+
+  /articles/{id}/stock:
+    put:
+      tags:
+        - Articles
+      summary: Mettre à jour le stock d'un article
+      description: Mettre à jour la quantité en stock d'un article spécifique
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockUpdate'
+      responses:
+        '200':
+          description: Stock de l'article mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+
+   
