@@ -23,7 +23,7 @@ class CustumPasswordRule implements ValidationRule
         ];
         // dd($attribute);
         $validator = Validator::make(request()->all(), [
-            $attribute => ['required', Password::min(8)->letters()->mixedCase()->numbers()->uncompromised()],
+            $attribute => ['required', Password::min(8)->letters()->mixedCase()->numbers()],
         ]);
 
 

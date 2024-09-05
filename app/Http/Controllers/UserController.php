@@ -37,7 +37,7 @@ class UserController extends Controller
             'role_id' => $role['id'],
         ]);
         $role->users()->save($user);
-        return $this->sendResponse(['message' =>'User created successfully']);
+        return response()->json(['message' =>'User created successfully']);
     }
 
     //get all users
@@ -55,7 +55,7 @@ class UserController extends Controller
         }
         $users = $query->get();
         // $users = User::all();
-        return ApiResponse::sendResponse(UserResource::collection($users)); 
+        return response()->json(UserResource::collection($users)); 
     }
 
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use Illuminate\Http\Request;
+use App\Services\ArticleServiceInterface;
 use App\Traits\ApiResponse;
 use App\Http\Resources\ArticleResource;
 
@@ -11,6 +12,13 @@ use Validator;
 
 class ArticleController extends Controller
 {
+
+    protected $articleService;
+
+    public function __construct(ArticleServiceInterface $articleService)
+    {
+        $this->articleService = $articleService;
+    }
     public function index(Request $request)
     {
         $this->authorize('access', Article::class);
@@ -23,7 +31,7 @@ class ArticleController extends Controller
         } else {
             $articles = Article::all();
         }
-        return ApiResponse::SendResponse(ArticleResource::collection($articles));
+        return response()->json(ArticleResource::collection($articles));
     }
     
 
@@ -51,7 +59,7 @@ class ArticleController extends Controller
             'qteStock' => $request->qteStock,
         ]);
 
-        return ApiResponse::SendResponse([
+        return response()->json([
             'status' => 'success',
             'data' => new ArticleResource($article)
         ], 201);
@@ -67,7 +75,7 @@ class ArticleController extends Controller
         //     ], 404);
         // }
 
-        return ApiResponse::SendResponse(new ArticleResource($article));
+        return response()->json(new ArticleResource($article));
     }
 
    
@@ -148,7 +156,7 @@ class ArticleController extends Controller
         $article->save();
 
         // Retour de la réponse avec l'article mis à jour
-        return ApiResponse::SendResponse([
+        return response()->json([
             'status' => 'success',
             'data' => new ArticleResource($article)
         ]);
@@ -160,7 +168,7 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
         $article->delete();
 
-        return  ApiResponse::SendResponse(['message' => 'Article deleted successfully']);
+        return  response()->json(['message' => 'Article deleted successfully']);
     }
     public function searchByLibelle(Request $request)
 {
@@ -187,7 +195,7 @@ class ArticleController extends Controller
     }
 
     // Retour de la réponse avec l'article trouvé
-    return ApiResponse::SendResponse(new ArticleResource($article));
+    return response()->json(new ArticleResource($article));
 }
 
 }

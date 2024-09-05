@@ -22,6 +22,7 @@ use App\Http\Controllers\ArticleController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+// Route::post('login', [AuthController::class, 'login']);
 
 Route::prefix('v1')->group(function () {
     Route::apiResource('/clients', ClientController::class)->only(['index', 'store','show']);
@@ -33,7 +34,7 @@ Route::prefix('v1/users')->middleware('auth:api')->group(function () {
 });
 
 Route::prefix('v1/users')->group(function () {
-    Route::post('login', [AuthController::class, 'login']);
+    Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register'])->middleware(['auth:api','role:Boutiquier']);
 });
 Route::middleware('auth:api')->group(function () {
@@ -56,7 +57,9 @@ Route::prefix('v1/articles')->middleware(['auth:api','role:Boutiquier'])->name('
 Route::prefix('v1/clients')->middleware(['auth:api','role:Boutiquier'])->name('clients.')->group(function () {
     // Routes pour les clients
     Route::post('/', [ClientController::class, 'store'])->name('store');
-    Route::post('/telephone', [ClientController::class, 'getByTelephone']);
+    // Route::get('/', [ClientController::class, 'store'])->name('store');
+    // Route::post('/telephone', [ClientController::class, 'getByTelephone']);
+    Route::post('/telephone', [ClientController::class, 'getByTelephone'])->name('getByTelephone');
     Route::get('/', [ClientController::class, 'index'])->name('index');
     Route::get('/{id}', [ClientController::class, 'show']);
     Route::get('/{id}/user', [ClientController::class, 'show']);

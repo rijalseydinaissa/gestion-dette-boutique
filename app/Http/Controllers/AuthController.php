@@ -11,43 +11,28 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\RestResponseTrait;
 use App\Models\Role;
+use App\Services\AuthentificationServiceInterface;
 
 
 class AuthController extends Controller
 {
     use RestResponseTrait;
     
-    public function login(Request $request){
-        $validator = Validator::make($request->all(), [
-            'login' => ['required','string','max:255'],
-            'password' => ['required','string','min:8'],
-        ]);
+    protected $authService;
 
-        if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 402);
-        }
+    public function __construct(AuthentificationServiceInterface $authService)
+    {
+        $this->authService = $authService;
+    }
 
-        if(Auth::attempt(['login' => $request->login, 'password' => $request->password])){
-            $user = Auth::user();
-            $token = $user->createToken('LaravelPassportAuth')->accessToken;
-            return response()->json(['token' => $token], 200);
-        } else {
-            return response()->json(['error'=>'Unauthorised'], 401);
-        }
+    public function login(Request $request)
+    {
+        return $this->authService->authenticate($request);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke();
-        return response()->json(['message' => 'Successfully logged out'], 200);
-    }
-
-    /**
-     * Get the authenticated User.
-     */
-    public function user(Request $request)
-    {
-        return response()->json($request->user());
+        return $this->authService->logout($request);
     }
     public function register(Request $request)
     {

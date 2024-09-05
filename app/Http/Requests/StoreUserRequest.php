@@ -31,9 +31,10 @@ class StoreUserRequest extends FormRequest
         return [
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
-            'login' => 'required|string|max:255|unique:users,login',
+            'login' => 'required|email|max:255|unique:users,login',
             'role_id' => 'required|integer|exists:roles,id', // Validation de l'ID du rôle
             'etat' => 'required|boolean',
+            'photo' => ['nullable','image','mimes:jpeg,png,jpg,gif','max:2048'],
             'password' => ['confirmed', new CustumPasswordRule()],
         ];
     }
@@ -47,6 +48,10 @@ class StoreUserRequest extends FormRequest
             'login.unique' => "Cet login est déjà utilisé.",
             'etat.required' => 'L\'état est obligatoire.',
             'etat.boolean' => 'L\'état doit être un booléen valide.',
+            'photo.image' => 'Le format de l\'image doit être une image valide.',
+            'photo.mimes' => 'Le format de l\'image doit être une des suivantes: jpeg, png, jpg, gif.',
+            // 'photo.max' => 'L\'image ne doit pas dépasser 2MB.',
+            'password.confirmed' => 'Les mots de passe ne correspondent pas.',
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
             'role_id.required' => 'Le rôle est obligatoire.',
             'role_id.integer' => 'Le rôle doit être un identifiant numérique valide.',

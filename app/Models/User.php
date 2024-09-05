@@ -22,6 +22,7 @@ class User extends Authenticatable
         'nom',
         'prenom',
         'login',
+        'photo',
         'role_id',
         'password',
         'etat',

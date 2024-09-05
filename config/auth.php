@@ -43,8 +43,7 @@ return [
 
     'api' => [
         'driver' => 'passport', // ou 'token' si tu utilises les tokens natifs de Laravel
-        'provider' => 'users',
-        'hash' => false,
+        'provider' => 'users'
     ],
 ],
 

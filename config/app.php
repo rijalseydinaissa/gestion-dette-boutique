@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
+
 return [
 
     /*
@@ -161,7 +162,7 @@ return [
         ],
 
         'api' => [
-            'driver' => 'passport',
+            'driver' => 'sacn',
             'provider' => 'users',
         ],
     ],
@@ -180,6 +181,10 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\AuthCustomServiceProvider::class,
+        CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider::class,
+
+        // 'ClientService' => App\Facades\ClientServiceFacade::class,
     ])->toArray(),
 
     /*
@@ -195,6 +200,10 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
+        'UploadFacade' => App\Facades\UploadFacade::class,
+        'ClientServiceFacade' => App\Facades\ClientServiceFacade::class,
+        'uploadservice' => App\Facades\UploadFacade::class,
+        'qrcodefacade' => App\Facades\QrCodeFacade::class,
     ])->toArray(),
 
 ];

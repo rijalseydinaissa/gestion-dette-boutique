@@ -21,10 +21,13 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\ApiResponseMiddleware::class,
     ];
     protected $routeMiddleware = [
         // ...
         'role' => \App\Http\Middleware\CheckRole::class,
+        'auth' => \App\Http\Middleware\Authenticate::class,
+        'auth:api' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
     ];
     /**
      * The application's route middleware groups.
