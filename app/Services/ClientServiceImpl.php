@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\UploadClientPhotoJob;
 use App\Repository\ClientRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
@@ -14,6 +15,8 @@ use App\Models\Client;
 use App\Mail\LoyaltyCardMail;
 use App\Exceptions\ClientCreationException;
 use App\Exceptions\UserCreationException;
+use App\Events\ClientCreated;
+use Illuminate\Support\Facades\Event;
 
 // use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Models\User;
@@ -21,6 +24,8 @@ use App\Models\LoyaltyCard;
 use Illuminate\Support\Facades\Mail;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ClientServiceImpl implements ClientServiceInterface
 {
@@ -45,78 +50,55 @@ class ClientServiceImpl implements ClientServiceInterface
 
     public function createClient(array $data): Client
     {
-        // Traitement de la photo
+        // Traitement de la photo localement pour pouvoir l'utiliser dans l'événement
+        $photo = null;
         if (isset($data['user']['photo']) && $data['user']['photo'] instanceof \Illuminate\Http\UploadedFile) {
-            $data['user']['photo'] = UploadFacade::uploadImage($data['user']['photo']);
+            $photo = $data['user']['photo'];
         }
-        $photoBase64 = $data['user']['photo'] ? UploadFacade::getImageAsBase64($data['user']['photo']) : null;
+        $photoBase64 = $photo ? UploadFacade::getImageAsBase64($photo) : null;
         $qrCodeBase64 = QrCodeFacade::generateBase64QrCode($data['telephone']);
-
+        // Générer la carte de fidélité avec QR code
         $this->qrCodeService->createLoyaltyCard(
             $data['surname'],
-            $data['telephone'],  
+            $data['telephone'],
             $photoBase64,
             $qrCodeBase64
         );
         $data['qrcode'] = $qrCodeBase64;
-
-        $userData = isset($data['user']) ? [
-            'nom' => $data['user']['nom'],
-            'prenom' => $data['user']['prenom'],
-            'login' => $data['user']['login'],
-            'password' => bcrypt($data['user']['password']),
-            'etat' => $data['user']['etat'],
-            'role_id' => $data['user']['role'],
-            'photo' => $photoBase64,
-        ] : null;
-
+        // Préparer les données utilisateur
+        $userData =$data['user'];
+        $userData = empty($userData) ? null : collect($userData)->except(['password_confirmation'])->toArray();
         try {
             $client = $this->clientRepository->create($data, $userData);
+            if ($photo) {
+                try {
+                    $url = Storage::disk('public')->url($photo);
+                    $uploadedFileUrl = Cloudinary::upload($url)->getSecurePath();
+                    $client->user->photo = $uploadedFileUrl; 
+                    $client->user->save();  
+                } catch (\Exception $e) {
+                    // En cas d'erreur Cloudinary, stocker la photo localement dans la base de données
+                    $client->user->photo = $photoBase64;
+                    $client->user->save();  
+                    Log::error('Erreur lors du téléchargement de la photo sur Cloudinary : ' . $e->getMessage());
+                }
+            }
         } catch (UserCreationException $e) {
             throw $e;
         } catch (ClientCreationException $e) {
             throw $e;
         }
-
-        Mail::to($client->user->login)->send(new LoyaltyCardMail($client));
-
+        // Lever l'événement ClientCreated
+        if ($photo) {
+            Event::dispatch(new ClientCreated($client, $photo));
+        }
+        if ($client->user->role_id == 2) {
+            Mail::to($client->user->login)->send(new LoyaltyCardMail($client));
+        }
         return $client;
     }
-    // public function createClient(array $data): Client
-    // {
-    //     // Traitement de la photo
-    //     if (isset($data['user']['photo']) && $data['user']['photo'] instanceof \Illuminate\Http\UploadedFile) {
-    //         $uploadedFileUrl = Cloudinary::upload($data['user']['photo']->getRealPath())->getSecurePath();
-    //         $data['user']['photo'] = $uploadedFileUrl;
-    //     }
 
-    //     $photoBase64 = $data['user']['photo'] ? UploadFacade::getImageAsBase64($data['user']['photo']) : null;
-    //     $qrCodeBase64 = QrCodeFacade::generateBase64QrCode($data['telephone']);
-
-    //     $this->qrCodeService->createLoyaltyCard(
-    //         $data['surname'],
-    //         $data['telephone'],  
-    //         $photoBase64,
-    //         $qrCodeBase64
-    //     );
-
-    //     $data['qrcode'] = $qrCodeBase64;
-
-    //     $userData = isset($data['user']) ? [
-    //         'nom' => $data['user']['nom'],
-    //         'prenom' => $data['user']['prenom'],
-    //         'login' => $data['user']['login'],
-    //         'password' => bcrypt($data['user']['password']),
-    //         'etat' => $data['user']['etat'],
-    //         'role_id' => $data['user']['role'],
-    //         'photo' => $data['user']['photo'],  // On garde l'URL de la photo sur Cloudinary
-    //     ] : null;
-
-    //     $client = $this->clientRepository->create($data, $userData);
-    //     Mail::to($client['user']['login'])->send(new LoyaltyCardMail($client));
-
-    //     return $client;
-    // }
+  
     public function getClientById($id): ?Client
     {
         $client = $this->clientRepository->find($id);

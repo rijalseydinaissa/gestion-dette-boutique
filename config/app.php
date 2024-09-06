@@ -56,7 +56,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://127.0.0.1:3000'),
 
     'asset_url' => env('ASSET_URL'),
 
@@ -186,7 +186,7 @@ return [
 
         // 'ClientService' => App\Facades\ClientServiceFacade::class,
     ])->toArray(),
-
+   
     /*
     |--------------------------------------------------------------------------
     | Class Aliases
@@ -204,6 +204,7 @@ return [
         'ClientServiceFacade' => App\Facades\ClientServiceFacade::class,
         'uploadservice' => App\Facades\UploadFacade::class,
         'qrcodefacade' => App\Facades\QrCodeFacade::class,
+        'Cloudinary' => CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::class,
     ])->toArray(),
 
 ];

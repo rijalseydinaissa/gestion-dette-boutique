@@ -16,6 +16,7 @@ use App\Services\QrCodeInterface;
 use App\Services\ClientServiceImpl;
 use App\Repository\ClientRepositoryImpl;
 use App\Services\ClientServiceInterface;
+use App\Services\CloudinaryService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('qrcodefacade', function ($app) {
             return new QrCodeService();
+        });
+
+        $this->app->singleton('cloudinaryservice', function ($app) {
+            return new CloudinaryService();
         });
     }
 }
