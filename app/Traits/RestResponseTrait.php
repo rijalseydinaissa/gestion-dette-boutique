@@ -6,7 +6,7 @@ use App\Enums\StateEnum;
 
 trait RestResponseTrait
 {
-    public function sendResponse($data,StateEnum $status= StateEnum::SUCCESS, $message = 'Ressource non trouvée',$codeStatut = 200)
+    public function sendResponse($data ,$status, $message ,$codeStatut = 200)
     {
         return response()->json([
             'data' =>$data,

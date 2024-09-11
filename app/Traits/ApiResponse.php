@@ -16,7 +16,7 @@ trait ApiResponse
      */
 
      
-    public static function SendResponse($data, $status = 'success', $statusCode = 200)
+    public static function SendResponse($data, $status , $statusCode = 200)
     {
         return response()->json([
             'statut' => $status,

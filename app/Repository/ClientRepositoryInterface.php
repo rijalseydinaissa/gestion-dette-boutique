@@ -10,5 +10,6 @@ interface ClientRepositoryInterface
     public function all($filters): Collection;
     public function create(array $clientData, array $userData = null): Client;
     public function find($id): ?Client;
-     public function ByTelephone(string $telephone): Client;
+     public function ByTelephone(string $telephone): ?Client;
+     public function make(array $data): Client;
 }

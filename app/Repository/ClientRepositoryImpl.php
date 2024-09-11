@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Repository;
 
 use App\Models\Client;
@@ -9,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Exceptions\ClientCreationException;
 use App\Exceptions\UserCreationException;
+use Illuminate\Support\Facades\Log;
 
 class ClientRepositoryImpl implements ClientRepositoryInterface
 {
@@ -25,7 +25,6 @@ class ClientRepositoryImpl implements ClientRepositoryInterface
                 $query->whereNull('user_id');
             }
         }
-
         if (isset($filters['active'])) {
             if ($filters['active'] === 'oui') {
                 $query->whereHas('user', function($q) {
@@ -37,8 +36,7 @@ class ClientRepositoryImpl implements ClientRepositoryInterface
                 });
             }
         }
-        
-        return $query->get(); // Utilisez la méthode get() pour obtenir les résultats filtrés
+        return $query->get();
     }
 
     public function create(array $clientData, array $userData = null): Client
@@ -48,15 +46,18 @@ class ClientRepositoryImpl implements ClientRepositoryInterface
             // Créer le client
             $client = Client::create($clientData);
             // Créer l'utilisateur s'il existe
+            Log::info('Données utilisateur avant création : ', $userData);
             if ($userData) {
                 $user = User::create($userData);
                 $user->client()->save($client);
             }
+
             DB::commit();
             return $client;
         } catch (\Exception $e) {
             DB::rollBack();
-            if (isset($userData)) {
+            Log::error('Erreur lors de la création du client ou de l\'utilisateur : ' . $e->getMessage());
+            if ($userData) {
                 throw new UserCreationException();
             }
             throw new ClientCreationException();
@@ -68,8 +69,13 @@ class ClientRepositoryImpl implements ClientRepositoryInterface
         return Client::find($id);
     }
 
-    public function ByTelephone(string $telephone): Client
+    public function ByTelephone(string $telephone): ?Client
+{
+    return Client::where('telephone', $telephone)->first();
+}
+
+    public function make(array $data): Client
     {
-        return Client::where('telephone', $telephone)->first();
+        return Client::make($data);  // Utilise make() d'Eloquent ici
     }
 }

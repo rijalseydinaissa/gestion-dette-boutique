@@ -13,6 +13,7 @@ class ClientCreated
 
     public $client;
     public $photo;
+    public $path;
 
     /**
      * Create a new event instance.
@@ -21,11 +22,14 @@ class ClientCreated
      * @param \Illuminate\Http\UploadedFile $photo
      * @return void
      */
-    public function __construct(Client $client, $photo)
+    public function __construct(Client $client,$path)
     {
         // Log::info($photo);
-        // dd($photo);
+        //dd($photo);
         $this->client = $client;
-        $this->photo = $photo;
+        $this->path = $path;
+        // $this->photo = $photo;
+        // dd($client);
+        // $this->photo = $photo;
     }
 }

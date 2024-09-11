@@ -4,10 +4,10 @@ namespace App\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class QrCodeFacade extends Facade
+class QrCodeMailFacade extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'qrcodefacade';
+        return 'qrcodemailfacade';
     }
 }

@@ -5,10 +5,10 @@ namespace App\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class UploadFacade extends Facade
+class PhotoUploadFacade extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'uploadservice';
+        return 'photouploadservice';
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Dette;
 
 class Article extends Model
 {
@@ -24,6 +25,12 @@ class Article extends Model
             return $query->where('qteStock', '=', 0);
         }
         return $query;
+    }
+    public function dettes()
+    {
+        return $this->belongsToMany(Dette::class, 'article_dette')
+                    ->withPivot('qteVente', 'prixVente')
+                    ->withTimestamps();
     }
 
 

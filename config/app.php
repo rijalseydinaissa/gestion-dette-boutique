@@ -200,11 +200,12 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
-        'UploadFacade' => App\Facades\UploadFacade::class,
+        'photouploadservice' => App\Facades\PhotoUploadFacade::class,
         'ClientServiceFacade' => App\Facades\ClientServiceFacade::class,
-        'uploadservice' => App\Facades\UploadFacade::class,
-        'qrcodefacade' => App\Facades\QrCodeFacade::class,
+        // 'uploadservice' => App\Facades\UploadFacade::class,
+        'qrcodemailfacade' => App\Facades\QrCodeMailFacade::class,
         'Cloudinary' => CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::class,
+        'Dette' => App\Facades\DetteFacade::class,
     ])->toArray(),
 
 ];

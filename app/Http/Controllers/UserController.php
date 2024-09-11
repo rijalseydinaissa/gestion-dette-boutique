@@ -37,25 +37,28 @@ class UserController extends Controller
             'role_id' => $role['id'],
         ]);
         $role->users()->save($user);
-        return response()->json(['message' =>'User created successfully']);
+        return response()->json(['message' =>'User created successfully',$user]);
     }
 
     //get all users
-    public function index( Request $request){
-
+    // UserController.php
+    public function index(Request $request)
+    {
         $role = $request->query('role');
         $etat = $request->query('etat');
 
-        $query = User::query();
-        if (!$role==null) {
+        $query = User::with('role'); // Charger la relation 'role'
+        
+        if ($role !== null) {
             $query->where('role_id', $role);
         }
-        if (!$etat==null) {
+        if ($etat !== null) {
             $query->where('etat', $etat);
         }
+
         $users = $query->get();
-        // $users = User::all();
         return response()->json(UserResource::collection($users)); 
     }
+
 
 }

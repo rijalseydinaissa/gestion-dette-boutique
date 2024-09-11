@@ -21,7 +21,7 @@ class ArticleController extends Controller
     }
     public function index(Request $request)
     {
-        $this->authorize('access', Article::class);
+        // $this->authorize('access', Article::class);
         // Récupération du paramètre 'disponible' de la requête
         $disponible = $request->query('disponible');
         if ($disponible === 'oui') {
@@ -60,22 +60,24 @@ class ArticleController extends Controller
         ]);
 
         return response()->json([
-            'status' => 'success',
+            // 'status' => 'success',
             'data' => new ArticleResource($article)
         ], 201);
     }
 
     public function show($id)
     {
-        $article = Article::findOrFail($id);
-
-        // if (!$article) {
-        //     return response()->json([
-        //        'message' => 'Article not found',
-        //     ], 404);
-        // }
-
-        return response()->json(new ArticleResource($article));
+        try {
+            //code...
+            $article = Article::findOrFail($id);
+            return response()->json(new ArticleResource($article));
+        } catch (\Throwable $th) {
+            return response()->json([
+               'status' => 'error',
+               'message' => 'Article introuvable.',
+            ], 404);
+        }
+        
     }
 
    
@@ -83,25 +85,22 @@ class ArticleController extends Controller
     public function update(Request $request)
     {
         $articles = $request->input('articles', []);
-    
-        // Vérification si le tableau d'articles est vide
         if (empty($articles)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Le tableau articles doit contenir au moins un article pour la mise à jour.',
             ], 422);
         }
-    
         $failedUpdates = [];
         $successfulUpdates = [];
-    
+
+
         // Parcourir chaque article dans la requête
         foreach ($articles as $articleData) {
             $validator = Validator::make($articleData, [
                 'id' => 'required|exists:articles,id',
                 'qteStock' => 'required|integer|min:1',
             ]);
-    
             if ($validator->fails()) {
                 // Ajouter l'ID de l'article avec l'erreur de validation dans failedUpdates
                 $failedUpdates[] = [
@@ -110,7 +109,8 @@ class ArticleController extends Controller
                 ];
             } else {
                 // Mettre à jour la quantité de l'article si la validation réussit
-                $article = Article::find($articleData['id']);
+                $article = Article::findOrFail($articleData['id']);
+                // dd($articleData["id"]);
                 if ($article) {
                     $article->qteStock += $articleData['qteStock'];
                     $article->save();
@@ -133,35 +133,26 @@ class ArticleController extends Controller
         $validated = Validator::make($request->all(), [
             'qteStock' => 'required|integer|min:0',
         ]);
-
         if ($validated->fails()) {
             return response()->json([
                 'status' => 'error',
                 'data' => $validated->errors()
             ], 422);
         }
-
-        // Recherche de l'article par son ID
         $article = Article::find($id);
-
         if (!$article) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Article not found',
             ], 404);
         }
-
-        // Mise à jour de la quantité en stock
         $article->qteStock += $request->input('qteStock');
         $article->save();
-
-        // Retour de la réponse avec l'article mis à jour
         return response()->json([
             'status' => 'success',
             'data' => new ArticleResource($article)
         ]);
     }
-
 
     public function destroy($id)
     {

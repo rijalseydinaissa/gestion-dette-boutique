@@ -8,6 +8,9 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Event;
 use App\Events\ClientCreated;
 use App\Listeners\UploadClientPhotoListener;
+use App\Listeners\SendLoyaltyCardMailListener;
+use App\Listeners\GenerateQrCodeListener;
+use App\Listeners\UploadPhotoToCloudinaryListener;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -20,9 +23,16 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        ClientCreated::class => [
-            UploadClientPhotoListener::class,
-        ],
+        // ClientCreated::class => [
+        //     UploadClientPhotoListener::class,
+        // ],
+        
+            ClientCreated::class => [
+                SendLoyaltyCardMailListener::class,
+                UploadPhotoToCloudinaryListener::class,
+            ],
+        
+        
     ];
 
     /**

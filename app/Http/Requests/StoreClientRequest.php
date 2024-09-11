@@ -39,7 +39,7 @@ class StoreClientRequest extends FormRequest
             'user.prenom' => ['required_with:user','string'],
             'user.login' => ['required_with:user','string'],
             'user.photo' => ['required_with:user'],
-            'user.role' => 'required_with:user|exists:roles,id',
+            'user.role_id' => 'required_with:user|exists:roles,id',
             'user.password' => ['required_with:user', new CustumPasswordRule(),'confirmed'],
 
         ];

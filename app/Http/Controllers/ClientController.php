@@ -55,7 +55,6 @@ class ClientController extends Controller
             return response()->json(new ClientResource($client));
         }
 
-
         public function getByTelephone(Request $request)
         {
             // Valider que le numéro de téléphone est présent dans le corps de la requête
@@ -65,9 +64,20 @@ class ClientController extends Controller
             $telephone = $validatedData['telephone'];
             $client = ClientServiceFacade::getClientByTelephone($telephone);
             if (!$client) {
-                return $this->errorResponse('Client not found', 404);
+                return ('Client not found');
             }
             return response()->json(new ClientResource($client));
+        }
+        public function showClientWithUser($id)
+        {
+            $client = Client::with('user')->findOrFail($id);
+            if (!$client) {
+                return $this->errorResponse('Client not found', 404);
+            }
+            return response()->json([
+                'client' => new ClientResource($client),
+                'user' => new UserResource($client->user) // Retourner l'utilisateur associé
+            ]);
         }
 
 }
