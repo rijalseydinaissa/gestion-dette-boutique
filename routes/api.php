@@ -75,11 +75,15 @@ Route::prefix('v1/dettes')->middleware(['auth:api'])->name('dettes.')->group(fun
     Route::post('/', [DetteController::class,'store'])->name('store');
     Route::post('/{id}/articles', [DetteController::class, 'articlesByDette']);
     // Route::post('/{id}/paiement', [DetteController::class, 'addPaiement']);
-    Route::post('/{id}/paeiments', [PaeimentController::class, 'addPayment']);
     Route::get('/{id}', [DetteController::class,'show']);
     Route::put('/{id}', [DetteController::class, 'update'])->name('update');
     Route::patch('/{id}', [DetteController::class, 'update'])->name('updates');
     Route::delete('/{id}', [DetteController::class, 'destroy'])->name('destroy');
 });
 
+Route::post('/{id}/teste', [PaeimentController::class, 'addPayment']);
+
+Route::get('/teste', function (Request $request) {
+    return response()->json(['message' => 'Test API Laravel']);
+});
 

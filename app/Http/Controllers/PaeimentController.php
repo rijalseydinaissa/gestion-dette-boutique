@@ -18,6 +18,7 @@ class PaeimentController extends Controller
 
     public function addPayment(Request $request, $detteId)
     {
+        // dd($detteId);
         try {
             // Validation des données
             $validatedData = $request->validate([
@@ -25,7 +26,7 @@ class PaeimentController extends Controller
             ]);
 
             // Ajouter le paiement via le service
-            $paiement = $this->paymentService->addPayment($detteId, $validatedData['montant']);
+            $paiement = $this->paymentService->addPayment($request, $detteId);
 
             return response()->json([
                 'statut' => 'success',

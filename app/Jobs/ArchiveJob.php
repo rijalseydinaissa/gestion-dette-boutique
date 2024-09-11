@@ -2,18 +2,18 @@
 
 namespace App\Jobs;
 
+use App\Services\ArchiveServiceInterface;
 use App\Models\Dette;
-use MongoDB\Client as MongoClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Bus\Queueable;
+use App\Services\ArchiveDetteInterface;
 
 class ArchiveJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, SerializesModels;
 
     protected $dette;
 
@@ -32,24 +32,9 @@ class ArchiveJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(ArchiveDetteInterface $archiveService)
     {
-        // Connexion à MongoDB
-        $client = new MongoClient(env('MONGO_URI'));
-        $collection = $client->selectCollection('archive_db', 'dettes_archives');
-
-        // Préparer les données à archiver
-        $detteData = [
-            'client_id' => $this->dette->client_id,
-            'montant' => $this->dette->montant,
-            'articles' => $this->dette->articles->toArray(), // récupérer les articles
-            'date' => now()
-        ];
-
-        // Archiver la dette et ses articles dans MongoDB
-        $collection->insertOne($detteData);
-
-        // Supprimer la dette de la base de données SQL
-        // $this->dette->delete();
+        $archiveService->archiveSettledDebts();
+        Log::info('Job d\'archivage exécuté.');
     }
 }

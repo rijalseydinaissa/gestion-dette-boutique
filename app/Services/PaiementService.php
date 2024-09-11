@@ -8,11 +8,11 @@ use Illuminate\Http\Request;
 
 class PaiementService
 {
-    protected $paiementService;
+    protected $paiementRepository;
 
-    public function __construct(PaiementService $paiementService)
+    public function __construct(PaiementRepository $paiementRepository)
     {
-        $this->paiementService = $paiementService;
+        $this->paiementRepository = $paiementRepository;
     }
 
     /**
@@ -29,7 +29,7 @@ class PaiementService
         ]);
         try {
             // Appeler le service pour ajouter le paiement
-            $paiement = $this->paiementService->addPayment($detteId, $validatedData['montant']);
+            $paiement = $this->paiementRepository->createPaiement(['dette_id' => $detteId, 'montant' => $validatedData['montant']]);
             return response()->json([
                 'statut' => 'success',
                 'message' => 'Paiement ajouté avec succès.',

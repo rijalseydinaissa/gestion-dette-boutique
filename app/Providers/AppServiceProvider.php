@@ -24,6 +24,9 @@ use App\Repository\DetteRepositoryInterface;
 use App\Services\DetteServiceImpl;
 use App\Services\PaiementService;
 use App\Repository\PaiementRepository;
+use App\Services\ArchiveDetteInterface;
+use App\Services\ArchiveMongoService;
+use App\Services\ArchiveFirebaseService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -58,6 +61,18 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->singleton(PaiementRepository::class, function ($app) {
             return new PaiementRepository();
+        });
+
+        $this->app->singleton(PaiementService::class, function ($app) {
+            return new PaiementService($app->make(PaiementRepository::class));
+        });
+        $this->app->bind(ArchiveDetteInterface::class, function ($app) {
+            // Choisir le service à utiliser en fonction des paramètres ou configurations
+            if (config('app.use_firebase')) {
+                return new ArchiveFirebaseService();
+            } else {
+                return new ArchiveMongoService();
+            }
         });
     }
 }
