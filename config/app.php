@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\TwilioServiceProvider;
+use Twilio\TwilioFacade;
 
 
 return [
@@ -183,7 +185,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\AuthCustomServiceProvider::class,
         CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider::class,
-
+        Kreait\Laravel\Firebase\ServiceProvider::class,
+        // Twilio\TwilioServiceProvider::class,
         // 'ClientService' => App\Facades\ClientServiceFacade::class,
     ])->toArray(),
    
@@ -206,6 +209,10 @@ return [
         'qrcodemailfacade' => App\Facades\QrCodeMailFacade::class,
         'Cloudinary' => CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::class,
         'Dette' => App\Facades\DetteFacade::class,
+
+
+   
+
     ])->toArray(),
 
 ];

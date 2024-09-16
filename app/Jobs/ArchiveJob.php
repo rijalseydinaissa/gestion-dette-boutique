@@ -2,39 +2,36 @@
 
 namespace App\Jobs;
 
-use App\Services\ArchiveServiceInterface;
-use App\Models\Dette;
+use App\Services\ArchiveDetteInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
-use App\Services\ArchiveDetteInterface;
+use Illuminate\Bus\Queueable;
 
 class ArchiveJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $dette;
+    protected $archiveService;
 
     /**
-     * Create a new job instance.
+     * Créer une nouvelle instance du job.
      *
-     * @param Dette $dette
+     * @param ArchiveDetteInterface $archiveService
      */
-    public function __construct(Dette $dette)
+    public function __construct()
     {
-        $this->dette = $dette;
+        // $this->archiveService = $archiveService;
     }
 
     /**
-     * Execute the job.
-     *
-     * @return void
+     * Exécuter le job.
      */
     public function handle(ArchiveDetteInterface $archiveService)
     {
+        // Appeler le service pour archiver les dettes
         $archiveService->archiveSettledDebts();
-        Log::info('Job d\'archivage exécuté.');
+         \Log::info('Archive');
     }
 }

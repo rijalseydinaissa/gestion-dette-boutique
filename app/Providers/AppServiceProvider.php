@@ -27,6 +27,8 @@ use App\Repository\PaiementRepository;
 use App\Services\ArchiveDetteInterface;
 use App\Services\ArchiveMongoService;
 use App\Services\ArchiveFirebaseService;
+use App\Services\SmsServiceInterface;
+use App\Services\TwilioService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -68,11 +70,17 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->bind(ArchiveDetteInterface::class, function ($app) {
             // Choisir le service à utiliser en fonction des paramètres ou configurations
-            if (config('app.use_firebase')) {
+            if (env("WALOMOYKADIOR")=="firebase") {
                 return new ArchiveFirebaseService();
             } else {
                 return new ArchiveMongoService();
             }
         });
+        $this->app->singleton('SmsService', function ($app) {
+            return new TwilioService(); // Retourne une instance de TwilioService ou ton autre service SMS
+        });
+        // $this->app->bind(ArchiveDetteInterface::class, ArchiveMongoService::class);
+        // $this->app->bind(ArchiveDetteInterface::class, ArchiveFirebaseService::class);
+        
     }
 }

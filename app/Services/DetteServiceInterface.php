@@ -8,5 +8,6 @@ interface DetteServiceInterface
     public function getAllDettes();
     public function getDebtsById($id);
     public function getArticlesByDette($id);
+    public function getPaiementsByDette($id);
     // public function addPayment($detteId, $montant);
 }

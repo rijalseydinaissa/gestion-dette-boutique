@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\PaiementService;
-
+use App\Jobs\ArchiveJob;
 class PaeimentController extends Controller
 {
     protected $paymentService;
@@ -27,7 +27,7 @@ class PaeimentController extends Controller
 
             // Ajouter le paiement via le service
             $paiement = $this->paymentService->addPayment($request, $detteId);
-
+            ArchiveJob::dispatch();
             return response()->json([
                 'statut' => 'success',
                 'message' => 'Paiement ajouté avec succès.',
@@ -40,5 +40,12 @@ class PaeimentController extends Controller
                 'data' => null
             ], 500);
         }
+    }
+    public function archiveDettes()
+    {
+        // Déclencher le job
+        ArchiveJob::dispatch();
+
+        return response()->json(['message' => 'Le processus d\'archivage a été déclenché.'], 200);
     }
 }

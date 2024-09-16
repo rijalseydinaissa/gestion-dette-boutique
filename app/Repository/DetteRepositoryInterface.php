@@ -8,5 +8,6 @@ interface DetteRepositoryInterface
     public function getAllDebts($statut = null);
     public function getDebtsById($id);
     public function getArticlesByDette($id);
+    public function getPaiementsByDette($id);
     // public function addDettePaeiment($id, $data);
 }

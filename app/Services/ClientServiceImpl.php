@@ -39,4 +39,8 @@ class ClientServiceImpl implements ClientServiceInterface
     {
         return $this->clientRepository->ByTelephone($telephone);
     }
+    public function getClientWithDettes($id): ?Client
+    {
+        return $this->clientRepository->findClientWithDettes($id);
+    }
 }

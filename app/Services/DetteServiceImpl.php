@@ -7,6 +7,7 @@ use App\Repository\DetteRepositoryInterface;
 use App\Models\Paiement;
 use App\Services\DetteServiceInterface;
 use App\Models\Article;
+use App\Models\Dette;
 
 class DetteServiceImpl implements DetteServiceInterface
 {
@@ -26,32 +27,44 @@ class DetteServiceImpl implements DetteServiceInterface
             if ($paiementMontant > $dette->montant) {
                 throw new \Exception("Le montant du paiement ne peut pas être supérieur au montant de la dette.");
             }
-            // dd($dette->id, $paiementMontant);
             Paiement::create([
                 'dette_id' => $dette->id,
                 'montant' => $paiementMontant,
-                // dd($dette->id),
             ]);
-            if ($paiementMontant = $dette->montant) {
-                return response()->json(['message' => 'Paiement effectué'], 200);
+            if ($paiementMontant == $dette->montant) {
+                return response()->json([
+                    'message' => 'Paiement effectué',
+                    'dette' => $dette,
+                ], 200);
             }
         }
-        return $dette;
-
+        return response()->json([
+            'message' => 'Dette ajoutée avec succès',
+            'dette' => $dette,
+        ], 200);
     }
+    
+
 
             public function getAllDettes($statut = null)
-        {
-            return $this->detteRepository->getAllDebts($statut);
-        }
+            {
+                return $this->detteRepository->getAllDebts($statut);
+            }
 
         public function getDebtsById($id)
-        {
-            return $this->detteRepository->getDebtsById($id);
-        }
+            {
+                return $this->detteRepository->getDebtsById($id);
+            }
 
-        public function getArticlesByDette($id){
+        // public function getArticlesByDette($id){
+        //     return $this->detteRepository->getArticlesByDette($id);
+        // }
+        public function getArticlesByDette($id)
+        {
             return $this->detteRepository->getArticlesByDette($id);
         }
-        
+    public function getPaiementsByDette($id)
+        {
+            return Dette::with('paiements')->find($id);
+        }
 }

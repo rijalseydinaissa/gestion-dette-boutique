@@ -5,6 +5,8 @@ namespace App\Console;
 use App\Jobs\TwilioJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Jobs\ArchiveJob;
+use App\Jobs\SendWeeklyDebtReminder;
 
 class Kernel extends ConsoleKernel
 {
@@ -14,7 +16,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->job(new TwilioJob)->weekly()->fridays()->at('14:00');
-        $schedule->job(new TwilioJob)->everyMinute();
+        $schedule->command('sms:send-reminders')->everyFiveMinutes();
+        $schedule->job(new SendWeeklyDebtReminder)->weekly();
+        //  $schedule->job(new ArchiveJob())->dailyAt('23:59');
     }
 
     /**

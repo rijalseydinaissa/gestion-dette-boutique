@@ -43,10 +43,14 @@ class ClientRepositoryImpl implements ClientRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            // Créer le client
-            $client = Client::create($clientData);
-            // Créer l'utilisateur s'il existe
-            Log::info('Données utilisateur avant création : ', $userData);
+           $request= request();
+           $clientData = $request->only(['surname', 'adresse', 'telephone', 'categorie_id']);
+           $clientData['max_montant'] = $request->input('categorie_id') == 2 ? $request->input('max_montant') : null; // 2 pour Silver
+           
+           // Créer le client
+           $client = Client::create($clientData);
+           // Créer l'utilisateur s'il existe
+           Log::info('Données utilisateur avant création : ', $userData);
             if ($userData) {
                 $user = User::create($userData);
                 $user->client()->save($client);
@@ -77,5 +81,9 @@ class ClientRepositoryImpl implements ClientRepositoryInterface
     public function make(array $data): Client
     {
         return Client::make($data);  // Utilise make() d'Eloquent ici
+    }
+    public function findClientWithDettes($id): ?Client
+    {
+        return Client::with('dettes')->find($id);
     }
 }

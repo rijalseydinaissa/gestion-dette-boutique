@@ -4,25 +4,31 @@ namespace App\Services;
 
 use Twilio\Rest\Client;
 
-class TwilioService
+
+
+class TwilioService implements NotificationServiceInterface
 {
-    protected $twilioClient;
-    protected $from;
+    protected $client;
 
     public function __construct()
     {
-        $this->twilioClient = new Client(config('services.twilio.sid'), config('services.twilio.token'));
-        $this->from = config('services.twilio.from');
+        $this->client = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
     }
 
-    public function sendSms($to, $message)
+    public function send(string $telephone, string $message): bool
     {
-        return $this->twilioClient->messages->create(
-            $to,
-            [
-                'from' => $this->from,
-                'body' => $message,
-            ]
-        );
+        try {
+            $this->client->messages->create(
+                '+221778170068', 
+                [
+                    'from' => env('TWILIO_PHONE_NUMBER'), 
+                    'body' => $message
+                ]
+            );
+            return true;
+        } catch (\Exception $e) {
+            // Log error
+            return false;
+        }
     }
 }

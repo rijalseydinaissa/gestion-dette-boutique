@@ -34,6 +34,11 @@ return [
     */
 
     'connections' => [
+        'mongodb' => [
+            'driver' => 'mongodb',
+            'dsn' => env('DB_URL', 'mongodb+srv://walonaynekh:walonaynekh@walonaynekh.zjohx.mongodb.net/?retryWrites=true&w=majority&appName=walonaynekh'),
+            'database' => 'WaloNAYNEKH',
+        ],
 
         'sqlite' => [
             'driver' => 'sqlite',

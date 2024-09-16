@@ -12,4 +12,5 @@ interface ClientRepositoryInterface
     public function find($id): ?Client;
      public function ByTelephone(string $telephone): ?Client;
      public function make(array $data): Client;
+     public function findClientWithDettes($id): ?Client;
 }

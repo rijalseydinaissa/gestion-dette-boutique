@@ -11,4 +11,5 @@ interface ClientServiceInterface
     public function createClient(array $data): Client;
     public function getClientById($id): ?Client;
     public function getClientByTelephone(string $telephone): ?Client;
+    public function getClientWithDettes($id): ?Client;
 }

@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             ClientsTableSeeder::class,
             UsersTableSeeder::class,
             ClientsUsersTableSeeder::class,
+            CategoriesTableSeeder::class,
         ]);
     }
 }

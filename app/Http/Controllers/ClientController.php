@@ -8,6 +8,7 @@ use App\Http\Resources\ClientResource;
 use App\Models\Client;
 use App\Facades\ClientServiceFacade;
 use App\Models\User;
+use App\Services\ClientServiceImpl;
 use App\Traits\RestResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,13 +26,12 @@ use Exception;
 class ClientController extends Controller
 {
     use RestResponseTrait;
+    protected $clientService;
 
-        protected $clientService;
-    
-        // public function __construct(ClientServiceInterface $clientService)
-        // {
-        //     $this->clientService = $clientService;
-        // }
+    public function __construct(ClientServiceImpl $clientService)
+    {
+        $this->clientService = $clientService;
+    }
     
         public function index(Request $request)
         {
@@ -79,6 +79,33 @@ class ClientController extends Controller
                 'user' => new UserResource($client->user) // Retourner l'utilisateur associé
             ]);
         }
+        // getClientWithDettes
+
+        public function paiementsByDette($id)
+        {
+            try {
+                // Récupérer la dette avec ses paiements associés
+                $dette = $this->clientService->getClientWithDettes($id);
+        
+                if (!$dette) {
+                    return response()->json([
+                        'statut' => 'echec',
+                        'message' => 'Aucune dette trouvée avec cet ID'
+                    ], 404);
+                }
+        
+                return response()->json([
+                    'statut' => 'success',
+                    'data' => [
+                        'dette' => $dette,  // Inclure l'objet dette
+                        'paiements' => $dette->paiements  // Inclure les paiements associés
+                    ]
+                ], 200);
+            } catch (Exception $e) {
+                return response()->json(['error' => $e->getMessage()], 400);
+            }
+        }
+        
 
 }
     

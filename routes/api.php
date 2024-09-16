@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\ArchiveController;
+use App\Http\Controllers\NotificationController;
 
 
 /*
@@ -63,6 +65,7 @@ Route::prefix('v1/clients')->middleware(['auth:api','role:Boutiquier'])->name('c
     Route::post('/telephone', [ClientController::class, 'getByTelephone'])->name('getByTelephone');
     Route::get('/', [ClientController::class, 'index'])->name('index');
     Route::get('/{id}', [ClientController::class, 'show']);
+    Route::get('/{id}/dettes', [ClientController::class, 'getClientWithDettes']);
     Route::get('/{id}/user', [ClientController::class, 'show']);
     Route::put('/{id}', [ClientController::class, 'update'])->name('update');
     Route::patch('/{id}', [ClientController::class, 'update'])->name('updates');
@@ -73,7 +76,13 @@ Route::prefix('v1/dettes')->middleware(['auth:api'])->name('dettes.')->group(fun
     // Routes pour les dettes
     Route::get('/', [DetteController::class, 'index'])->name('index');
     Route::post('/', [DetteController::class,'store'])->name('store');
+
+    Route::get('/archive', [DetteController::class,'showArchived']);
+
+    // Route::post('/{id}/articles', [DetteController::class, 'articlesByDette']);
+    
     Route::post('/{id}/articles', [DetteController::class, 'articlesByDette']);
+    Route::post('/{id}/paiements', [DetteController::class, 'paiementsByDette']);
     // Route::post('/{id}/paiement', [DetteController::class, 'addPaiement']);
     Route::get('/{id}', [DetteController::class,'show']);
     Route::put('/{id}', [DetteController::class, 'update'])->name('update');
@@ -81,9 +90,33 @@ Route::prefix('v1/dettes')->middleware(['auth:api'])->name('dettes.')->group(fun
     Route::delete('/{id}', [DetteController::class, 'destroy'])->name('destroy');
 });
 
-Route::post('/{id}/teste', [PaeimentController::class, 'addPayment']);
+    Route::post('/{id}/teste', [PaeimentController::class, 'addPayment']);
 
-Route::get('/teste', function (Request $request) {
-    return response()->json(['message' => 'Test API Laravel']);
+// Route::get('/teste', function (Request $request) {
+//     return response()->json(['message' => 'Test API Laravel']);
+// });
+
+// ->middleware(['auth:api','role:Boutiquier'])
+Route::prefix('v1')->group(function () {
+    // Route::post('/settled-debts', [ArchiveController::class, 'archiveSettledDebts']);
+    // Route::get('archive/clients/{id}/dettes', [ArchiveController::class,'showArchivedDebt']);
+    // Route::post('/restaure/{date}', [ArchiveController::class,'restoreDebtsByDate']);
+    // Route::post('/restaure/dette/{id}', [ArchiveController::class,'restoreDebt']);
+    // Route::post('/restaure/client/{id}', [ArchiveController::class,'restoreClientDebts']);
+    Route::get('archive/clients/{clientId}/dettes', [ArchiveController::class, 'getArchivedDebtsByClientId']);
+    Route::get('archive/dettes/{id}', [ArchiveController::class, 'getArchivedDebtById']);
+    Route::get('restaure/{date}', [ArchiveController::class, 'restoreDebtsByDate']);
+    Route::get('restaure/dettes/{id}', [ArchiveController::class, 'restoreDebt']);
+    Route::get('restaure/client/{clientId}', [ArchiveController::class, 'restoreDebtsForClient']);
+
+});
+Route::prefix('v1')->group(function () {
+    Route::get('notification/client/{id}',[NotificationController::class, 'sendReminderToClient']);
+    // Route::get('notification/client/{id}', [NotificationController::class, 'sendReminderToClient']);
+    Route::post('notification/client/all', [NotificationController::class, 'sendReminderToAllClients']);
+    Route::post('notification/client/message', [NotificationController::class, 'sendCustomMessage']);
+    Route::get('client/{id}/notifications/unread', [NotificationController::class, 'getUnreadNotifications']);
+    Route::get('client/{id}/notifications/read', [NotificationController::class, 'getReadNotifications']);
 });
 
+// Route::get('test',[NotificationController::class, 'test']);

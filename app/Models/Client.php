@@ -42,7 +42,7 @@ class Client extends Model
     {
         return $this->temporaryAttributes[$key] ?? null;
     }
-    protected $appends = ['photo_base64'];
+    // protected $appends = ['photo_base64'];
 
     function user() {
         return $this->belongsTo(User::class);
@@ -52,4 +52,9 @@ class Client extends Model
     {
         return $this->hasMany(Dette::class);
     }
+    public function notifications()
+{
+    return $this->hasMany(Notification::class);
+}
+
 }
