@@ -43,21 +43,20 @@ class ClientRepositoryImpl implements ClientRepositoryInterface
     {
         DB::beginTransaction();
         try {
-           $request= request();
-           $clientData = $request->only(['surname', 'adresse', 'telephone', 'categorie_id']);
-           $clientData['max_montant'] = $request->input('categorie_id') == 2 ? $request->input('max_montant') : null; // 2 pour Silver
-           
-           // Créer le client
-           $client = Client::create($clientData);
-           // Créer l'utilisateur s'il existe
-           Log::info('Données utilisateur avant création : ', $userData);
+            $request = request();
+            $clientData = $request->only(['surname', 'adresse', 'telephone', 'categorie_id']);
+            if ($clientData['categorie_id'] != 2 && $request->filled('max_montant')) {
+                throw new \Exception('Un client qui n\'est pas Silver ne peut pas avoir de max_montant.');
+            }
+            $clientData['max_montant'] = $clientData['categorie_id'] == 2 ? $request->input('max_montant') : null;
+            $client = Client::create($clientData);
             if ($userData) {
                 $user = User::create($userData);
                 $user->client()->save($client);
+                // return $user;
             }
-
             DB::commit();
-            return $client;
+            return $client->load('user');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur lors de la création du client ou de l\'utilisateur : ' . $e->getMessage());
@@ -67,6 +66,7 @@ class ClientRepositoryImpl implements ClientRepositoryInterface
             throw new ClientCreationException();
         }
     }
+    
 
     public function find($id): ?Client
     {

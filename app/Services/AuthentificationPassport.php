@@ -11,6 +11,7 @@ class AuthentificationPassport implements AuthentificationServiceInterface
     public function authenticate(Request $request)
     {
         if(Auth::attempt(['login' => $request->login, 'password' => $request->password])){
+            // dd($request);
             $user = Auth::user();
             $token = $user->createToken('LaravelPassportAuth')->accessToken;
             return response()->json(['token' => $token], 200);

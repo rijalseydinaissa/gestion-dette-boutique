@@ -10,6 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\DemandeController;
 
 
 /*
@@ -32,7 +33,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('/clients', ClientController::class)->only(['index', 'store','show']);
 });
 
-Route::prefix('v1/users')->middleware('auth:api')->group(function () {
+Route::prefix('v1/users')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('index');  
     Route::post('/', [UserController::class, 'store'])->name('store')->middleware(['auth:api','role:Admin']);
 });
@@ -72,13 +73,11 @@ Route::prefix('v1/clients')->middleware(['auth:api','role:Boutiquier'])->name('c
     Route::delete('/{id}', [ClientController::class, 'destroy'])->name('destroy');
 });
 
-Route::prefix('v1/dettes')->middleware(['auth:api'])->name('dettes.')->group(function () {
+Route::prefix('v1/dettes')->middleware(['auth:api','role:Boutiquier'])->name('dettes.')->group(function () {
     // Routes pour les dettes
     Route::get('/', [DetteController::class, 'index'])->name('index');
     Route::post('/', [DetteController::class,'store'])->name('store');
-
     Route::get('/archive', [DetteController::class,'showArchived']);
-
     // Route::post('/{id}/articles', [DetteController::class, 'articlesByDette']);
     
     Route::post('/{id}/articles', [DetteController::class, 'articlesByDette']);
@@ -92,17 +91,8 @@ Route::prefix('v1/dettes')->middleware(['auth:api'])->name('dettes.')->group(fun
 
     Route::post('/{id}/teste', [PaeimentController::class, 'addPayment']);
 
-// Route::get('/teste', function (Request $request) {
-//     return response()->json(['message' => 'Test API Laravel']);
-// });
 
-// ->middleware(['auth:api','role:Boutiquier'])
-Route::prefix('v1')->group(function () {
-    // Route::post('/settled-debts', [ArchiveController::class, 'archiveSettledDebts']);
-    // Route::get('archive/clients/{id}/dettes', [ArchiveController::class,'showArchivedDebt']);
-    // Route::post('/restaure/{date}', [ArchiveController::class,'restoreDebtsByDate']);
-    // Route::post('/restaure/dette/{id}', [ArchiveController::class,'restoreDebt']);
-    // Route::post('/restaure/client/{id}', [ArchiveController::class,'restoreClientDebts']);
+Route::prefix('v1')->middleware(['auth:api','role:Admin'])->group(function () {
     Route::get('archive/clients/{clientId}/dettes', [ArchiveController::class, 'getArchivedDebtsByClientId']);
     Route::get('archive/dettes/{id}', [ArchiveController::class, 'getArchivedDebtById']);
     Route::get('restaure/{date}', [ArchiveController::class, 'restoreDebtsByDate']);
@@ -110,13 +100,19 @@ Route::prefix('v1')->group(function () {
     Route::get('restaure/client/{clientId}', [ArchiveController::class, 'restoreDebtsForClient']);
 
 });
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware(['auth:api','role:Boutiquier'])->group(function () {
     Route::get('notification/client/{id}',[NotificationController::class, 'sendReminderToClient']);
-    // Route::get('notification/client/{id}', [NotificationController::class, 'sendReminderToClient']);
     Route::post('notification/client/all', [NotificationController::class, 'sendReminderToAllClients']);
-    Route::post('notification/client/message', [NotificationController::class, 'sendCustomMessage']);
-    Route::get('client/{id}/notifications/unread', [NotificationController::class, 'getUnreadNotifications']);
-    Route::get('client/{id}/notifications/read', [NotificationController::class, 'getReadNotifications']);
+    Route::post('notification/client/message', [NotificationController::class, 'sendReminderToSelectedClients']);
+    Route::get('client/{id}/notification/unread', [NotificationController::class, 'getUnreadNotifications']);
+    Route::get('client/{id}/notification/read', [NotificationController::class, 'getReadNotifications']);
 });
 
-// Route::get('test',[NotificationController::class, 'test']);
+Route::prefix('v1')->middleware(['auth:api','role:Client'])->group(function () {
+    Route::post('demandes/{id}/relance', [DemandeController::class, 'relanceDemande']);
+    Route::post('demandes/{id}/traiter', [DemandeController::class, 'traiterDemande']);
+    Route::post('demandes', [DemandeController::class, 'store']);
+    Route::get('demandesList', [DemandeController::class, 'index']);
+});
+
+

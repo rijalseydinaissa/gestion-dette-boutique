@@ -22,7 +22,10 @@ class Client extends Model
         'adresse',
         'telephone',
         'qrcode',
-        'user_id'
+        'user_id',
+        'categorie_id',
+        'max_montant'
+
     ];
     protected $hidden = [
         //  'password',

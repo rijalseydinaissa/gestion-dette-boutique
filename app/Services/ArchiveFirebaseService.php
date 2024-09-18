@@ -3,9 +3,7 @@
 namespace App\Services;
 
 use Kreait\Firebase\Factory;
-use MongoDB\Database;
 use App\Services\ArchiveDetteInterface;
-use Carbon\Carbon;
 
 class ArchiveFirebaseService implements ArchiveDetteInterface
 {
@@ -15,61 +13,47 @@ class ArchiveFirebaseService implements ArchiveDetteInterface
     {
         $factory = (new Factory)
             ->withServiceAccount('/home/issa/Bureau/Laravel/GestionShop/gestion-dette-boutique/walonayneikh-firebase-adminsdk-yt3vc-1f7ac1a455.json')
-            ->withDatabaseUri('https://walonayneikh-default-rtdb.firebaseio.com');  // Replace with your Firebase Realtime Database URL
+            ->withDatabaseUri('https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-yt3vc%40walonayneikh.iam.gserviceaccount.com');
 
         $this->database = $factory->createDatabase();
     }
 
-    public function getDatabase(): Database
+    public function archiveSettledDebts($request = null)
     {
-        return $this->database;
+        $newData = $this->database->getReference(date('Y-m-d H:i:s'))->push($request);
+        return $newData->getValue();
     }
 
-    public function archiveSettledDebts($request = null)
-        {
-        $newData = $this->database->getReference(date('Y-m-d H:i:s'))->push($request);
-        return response()->json($newData->getValue());
-    }
     public function restoreDebt($id)
     {
-        try {
-            $debtRef = $this->database->getReference('dettes/' . $id);
-            $debt = $debtRef->getValue();
-
-            if ($debt) {
-                // Suppression après la restauration
-                $debtRef->remove();
-                return response()->json(['message' => 'Dette restaurée avec succès', 'dette' => $debt]);
-            } else {
-                return response()->json(['message' => 'Dette introuvable'], 404);
-            }
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+        $debtRef = $this->database->getReference('dettes/' . $id);
+        $debt = $debtRef->getValue();
+        if ($debt) {
+            $debtRef->remove();
+            return $debt;
         }
+        return null;
     }
 
     public function getAllArchivedDebts($filter = [])
     {
+        return $this->database->getReference('dettes')->getValue();
+    }
+
+    public function getArchivedDebtsByClientId($clientId)
+    {
         $archivedDebts = $this->database->getReference('dettes')->getValue();
-        return response()->json($archivedDebts);
-    }
-    public function getArchivedDebtsByClientId($clientId){
-        $archivedDebts = $this->database->getReference('dettes')->getValue();
-        $filteredDebts = [];
-        foreach ($archivedDebts as $id => $debt) {
-            if ($debt['client_id'] === (int) $clientId) {
-                $filteredDebts[$id] = $debt;
-            }
-        }
-        return response()->json($filteredDebts);
+        $filteredDebts = array_filter($archivedDebts, fn($debt) => $debt['client_id'] === (int) $clientId);
+        return $filteredDebts;
     }
 
-    public function getArchivedDebtById($id){
-
+    public function getArchivedDebtById($id)
+    {
+        return $this->database->getReference('dettes/' . $id)->getValue();
     }
-    public function restoreDebtsByDate($date){
-        // TODO: Implement restoreDebtsByDate method.
-    }
-   
 
+    public function restoreDebtsByDate($date)
+    {
+        // Logique pour restaurer des dettes à partir de Firebase par date
+    }
 }

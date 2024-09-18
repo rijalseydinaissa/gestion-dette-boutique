@@ -52,11 +52,9 @@ class ArchiveController extends Controller
         public function restoreDebt($id)
         {
             $restoredDebt = $this->archiveService->restoreDebt((int)$id);
-
             if ($restoredDebt) {
                 return response()->json(['message' => 'Dette restaurée avec succès', 'dette' => $restoredDebt], 200);
             }
-
             return response()->json(['message' => 'Erreur: Dette archivée introuvable'], 404);
         }
 

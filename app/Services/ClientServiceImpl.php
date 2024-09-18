@@ -20,8 +20,6 @@ class ClientServiceImpl implements ClientServiceInterface
     {
         $userData = $data['user'] ?? null;
         $client = $this->clientRepository->create($data, $userData);
-        // Lever l'événement pour le traitement asynchrone
-        // Event::dispatch(new ClientCreated($client));
         return $client;
     }
 
